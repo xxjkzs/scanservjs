@@ -27,6 +27,12 @@ class Context {
 
     /** @type {Filter[]} */
     this.filters = Config.filters;
+
+    /** @type {PaperSize[]} */
+    this.paperSizes = Config.paperSizes;
+
+    /** @type {string[]} */
+    this.batchModes = Config.batchModes;
   }
 
   /**

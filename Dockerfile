@@ -1,5 +1,5 @@
 # Builder image. Alpine doesn't have python which is required by node-sass
-FROM node:buster AS builder
+FROM node:14-buster AS builder
 ENV APP_DIR=/app
 WORKDIR "$APP_DIR"
 
@@ -20,13 +20,17 @@ RUN cd webui \
   && npm run server-build
 
 # production image
-FROM node:buster-slim
+FROM node:14-buster-slim
 ENV APP_DIR=/app
 WORKDIR "$APP_DIR"
 RUN apt-get update \
   && apt-get install -yq curl gpg \
-  && echo 'deb http://download.opensuse.org/repositories/home:/pzz/Debian_10/ /' | tee /etc/apt/sources.list.d/home:pzz.list \
-  && curl -fsSL https://download.opensuse.org/repositories/home:pzz/Debian_10/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/home:pzz.gpg > /dev/null \
+  && echo 'deb http://download.opensuse.org/repositories/home:/pzz/Debian_10/ /' \
+    | tee /etc/apt/sources.list.d/home:pzz.list \
+  && curl -fsSL https://download.opensuse.org/repositories/home:pzz/Debian_10/Release.key \
+    | gpg --dearmor \
+    | tee /etc/apt/trusted.gpg.d/home:pzz.gpg \
+    > /dev/null \
   && apt-get update \
   && apt-get install -yq \
     imagemagick \
@@ -34,29 +38,37 @@ RUN apt-get update \
     sane-utils \
     sane-airscan \
     tesseract-ocr \
-  && sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"'/ /etc/ImageMagick-6/policy.xml
+  && sed -i \
+    's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"'/ \
+    /etc/ImageMagick-6/policy.xml \
+  && npm install -g npm@7.11.2
 
-COPY --from=builder "$APP_DIR/dist" "$APP_DIR/"
+# Create a known user
+RUN useradd -u 2001 -ms /bin/bash scanservjs
 
-RUN npm install --production
-
-# This goes into /etc/sane.d/net.conf
-ENV SANED_NET_HOSTS=""
-
-# This gets added to /etc/sane.d/airscan.conf
-ENV AIRSCAN_DEVICES=""
-
-# This directs scanserv not to bother querying `scanimage -L`
-ENV SCANIMAGE_LIST_IGNORE=""
-
-# This gets added to scanservjs/server/config.js:devices
-ENV DEVICES=""
-
-# Override OCR language
-ENV OCR_LANG=""
+ENV \
+  # This goes into /etc/sane.d/net.conf
+  SANED_NET_HOSTS="" \
+  # This gets added to /etc/sane.d/airscan.conf
+  AIRSCAN_DEVICES="" \
+  # This directs scanserv not to bother querying `scanimage -L`
+  SCANIMAGE_LIST_IGNORE="" \
+  # This gets added to scanservjs/server/config.js:devices
+  DEVICES="" \
+  # Override OCR language
+  OCR_LANG=""
 
 # Copy entry point
 COPY run.sh /run.sh
 RUN ["chmod", "+x", "/run.sh"]
 ENTRYPOINT [ "/run.sh" ]
+
+# Copy the code and install
+COPY --from=builder "$APP_DIR/dist" "$APP_DIR/"
+RUN npm install --production
+
+# Change the ownership of config and data since we need to write there
+RUN chown -R scanservjs:scanservjs config data /etc/sane.d/net.conf /etc/sane.d/airscan.conf
+USER scanservjs
+
 EXPOSE 8080

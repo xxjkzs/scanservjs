@@ -11,6 +11,7 @@
   ```
 
 ## Run for development
+
 ```
 cd webui && npm run serve
 ```
@@ -31,10 +32,12 @@ cd server && gulp release
 ```
 
 ## Updating node dependencies
+
 * `npm audit fix` or `npm update`. This won't remove old packages; to do so,
   delete node_modules and reinstall
 
 ## References
+
 * [Run server with webpack](https://dennisreimann.de/articles/vue-cli-serve-express.html)
 * [i18n](https://www.codeandweb.com/babeledit/tutorials/how-to-translate-your-vue-app-with-vue-i18n)
 
@@ -51,7 +54,7 @@ sudo chmod 666 /var/run/docker.sock
 ```
 
 Useful commands
-```console
+```sh
 # Build and run
 docker build -t scanservjs-image .
 docker rm --force scanservjs-container 2> /dev/null
@@ -79,10 +82,15 @@ docker container restart scanservjs-container
 # Maintenance
 docker ps -a
 docker image prune
+docker image rm -f $(docker image ls --filter dangling=true -q)
+
+# Danger
+docker image rm -f $(docker image ls -a -q)
 ```
 
 ## Mount map configuration files
-```
+
+```sh
 docker run -d \
   -p 8080:8080 \
   -v `pwd`/var/:/app/config/ \

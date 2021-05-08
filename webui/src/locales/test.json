@@ -8,7 +8,31 @@
     "issue": "##ABOUT.ISSUE"
   },
 
+  "colors": {
+    "accent-4": "##Default",
+    "red": "##Red",
+    "pink": "##Pink",
+    "purple": "##Purple",
+    "deep-purple": "##Deep purple",
+    "indigo": "##Indigo",
+    "blue": "##Blue",
+    "light-blue": "##Light blue",
+    "cyan": "##Cyan",
+    "teal": "##Teal",
+    "green": "##Green",
+    "light-green": "##Light green",
+    "lime": "##Lime",
+    "yellow": "##Yellow",
+    "amber": "##Amber",
+    "orange": "##Orange",
+    "deep-orange": "##Deep orange",
+    "brown": "##Brown",
+    "blue-grey": "##Blue grey",
+    "grey": "##Grey"
+  },
+
   "batch-dialog": {
+    "btn-cancel": "##CANCEL",
     "btn-finish": "##FINISH",
     "btn-rescan": "##RESCAN",
     "btn-next": "##NEXT"
@@ -30,6 +54,48 @@
     "version": "##VERSION"  
   },
 
+  "batch-mode": {
+    "none": "##NONE",
+    "manual": "##MANUAL",
+    "auto": "##AUTO",
+    "auto-collate-standard": "##COLLATE-STANDARD",
+    "auto-collate-reverse": "##COLLATE-REVERSE"
+  },
+  
+  "filter": {
+    "auto-level": "##SCAN.FILTERS:AUTO-LEVEL",
+    "threshold": "##SCAN.FILTERS:THRESHOLD",
+    "blur": "##SCAN.FILTERS:BLUR"
+  },
+
+  "mode": {
+    "color": "##COLOUR",
+    "halftone": "##HALFTONE",
+    "gray": "##GREY",
+    "lineart": "##LINEART",
+
+    "24bitcolor":"@:mode.color",
+    "black & white": "@:mode.lineart",
+    "gray(error diffusion)": "@:mode.halftone",
+    "true gray": "@:mode.gray",
+    "24bit color(fast)": "@:mode.color"
+  },
+
+  "source": {
+    "flatbed": "##FLATBED",
+    "adf": "##ADF",
+    "auto": "##AUTO",
+    "left-aligned": "##LEFT",
+    "centrally-aligned": "##CENTRAL",
+    "duplex": "##DUPLEX",
+
+    "automatic document feeder": "@:source.adf",
+    "automatic document feeder(left aligned)": "@:source.adf (@:source.left-aligned)",
+    "automatic document feeder(left aligned,duplex)": "@:source.adf (@:source.left-aligned, @:source.duplex)",
+    "automatic document feeder(centrally aligned)": "@:source.adf (@:source.centrally-aligned)",
+    "automatic document feeder(centrally aligned,duplex)": "@:source.adf (@:source.centrally-aligned, @:source.duplex)"
+  },
+
   "pipeline": {
     "high-quality": "##HIGH-QUALITY",
     "medium-quality": "##MEDIUM-QUALITY",
@@ -49,15 +115,7 @@
     "dynamic-lineart:enabled": "##ENABLED",
     "dynamic-lineart:disabled": "##DISABLED",
     "batch": "##SCAN.BATCH",
-    "batch:none": "##NONE",
-    "batch:manual": "##MANUAL",
-    "batch:auto": "##AUTO",
-    "batch:auto-collate-standard": "##COLLATE-STANDARD",
-    "batch:auto-collate-reverse": "##COLLATE-REVERSE",
     "filters": "##SCAN.FILTERS",
-    "filters:auto-level": "##SCAN.FILTERS:AUTO-LEVEL",
-    "filters:threshold": "##SCAN.FILTERS:THRESHOLD",
-    "filters:blur": "##SCAN.FILTERS:BLUR",
     "format": "##SCAN.FORMAT",
     "btn-preview": "##PREVIEW",
     "btn-clear": "##CLEAR",
@@ -67,6 +125,7 @@
     "left": "##SCAN.LEFT",
     "width": "##SCAN.WIDTH",
     "height": "##SCAN.HEIGHT",
+    "paperSize": "##SCAN.PAPERSIZE",
     "brightness": "##SCAN.BRIGHTNESS",
     "contrast": "##SCAN.CONSTRAST",
     "message:loading-devices": "##SCAN.LOADING",
@@ -85,6 +144,8 @@
     "theme:description": "##SETTINGS.THEME:DESCRIPTION",
     "theme:system": "##SETTINGS.THEME:SYSTEM",
     "theme:light": "##SETTINGS.THEME:LIGHT",
-    "theme:dark": "##SETTINGS.THEME:DARK"  
+    "theme:dark": "##SETTINGS.THEME:DARK",
+    "color": "##SETTINGS.COLOR",
+    "color:description": "##SETTINGS.COLOR:DESCRIPTION"
   }
 }
