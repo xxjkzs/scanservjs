@@ -22,6 +22,10 @@ Copyright 2016-2021 [Sam Strachan](https://github.com/sbs20)
 > an awesome web interface makes it even more brilliant!
 
 
+> This is a great project! The touchscreen and buttons on my Brother scanner are
+> broken, meaning the device is useless by itself because one cannot trigger
+> scans, but with this project I can trigger it remotely just fine.
+
 ## About
 
 scanservjs is a web UI frontend for your scanner. It allows you to share one or
@@ -38,7 +42,7 @@ complicated installation.
 * Filters: Autolevels, Threshold, Blur
 * Configurable overrides for all defaults as well as filters and formats
 * Multipage scanning (with collation for double sided scans)
-* International translations: Czech, French, German, Italian, Mandarin,
+* International translations: Czech, French, German, Italian, Mandarin, Polish,
   Portuguese (BR), Russian, Spanish;
   [Help requested](https://github.com/sbs20/scanservjs/issues/154)
 * Light and dark mode

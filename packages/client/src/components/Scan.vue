@@ -4,9 +4,13 @@
       <v-spacer/>
 
       <v-col cols="12" md="3" class="mb-10 mb-md-0">
-        <v-select v-if="context.devices.length > 0"
-          :label="$t('scan.device')" v-model="device"
-          :items="context.devices" return-object item-text="name" @change="clear"></v-select>
+        <div class="d-flex">
+          <v-select style="min-width: 0px;"
+            v-if="context.devices.length > 0"
+            :label="$t('scan.device')" v-model="device"
+            :items="context.devices" return-object item-text="name" @change="clear"></v-select>
+          <v-btn class="ml-2 mt-4 pl-1 pr-1" min-width="32" @click="deviceRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
+        </div>
 
         <v-select v-if="'--source' in device.features"
           :label="$t('scan.source')" v-model="request.params.source"
@@ -16,7 +20,7 @@
           :label="$t('scan.resolution')" v-model="request.params.resolution"
           :items="device.features['--resolution']['options']"></v-select>
 
-        <v-select
+        <v-select v-if="'--mode' in device.features"
           :label="$t('scan.mode')" v-model="request.params.mode"
           :items="modes" item-value="value" item-text="text"></v-select>
 
@@ -440,6 +444,14 @@ export default {
         } else {
           this.notify({ type: 'e', message: this.$t('scan.message:no-devices') });
         }
+      });
+    },
+
+    deviceRefresh() {
+      this._fetch('context', {
+        method: 'DELETE'
+      }).then(() => {
+        this.readContext();
       });
     },
 

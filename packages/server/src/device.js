@@ -129,7 +129,7 @@ class Adapter {
     let pattern = /\s+([-]{1,2}[-a-zA-Z0-9]+) ?(.*) \[(.*)\]\n/g;
     let match;
     while ((match = pattern.exec(response)) !== null) {
-      if (match[3] !== 'inactive') {
+      if (!['inactive', 'read-only'].includes(match[3])) {
         device.features[match[1]] = {
           'default': match[3],
           'parameters': match[2]
@@ -156,7 +156,7 @@ class Device {
   }
 
   validate() {
-    const mandatory = ['--mode', '--resolution', '-l', '-t', '-x', '-y'];
+    const mandatory = ['--resolution', '-l', '-t', '-x', '-y'];
     for (const feature of mandatory) {
       if (this.features[feature] === undefined) {
         throw `${feature} is missing from device`;
