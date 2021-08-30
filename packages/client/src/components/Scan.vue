@@ -9,7 +9,7 @@
             v-if="context.devices.length > 0"
             :label="$t('scan.device')" v-model="device"
             :items="context.devices" return-object item-text="name" @change="clear"></v-select>
-          <v-btn class="ml-2 mt-4 pl-1 pr-1" min-width="32" @click="deviceRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
+          <v-btn small class="ml-2 mt-5 pl-1 pr-1" min-width="32" @click="deviceRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
         </div>
 
         <v-select v-if="'--source' in device.features"
@@ -51,9 +51,9 @@
           item-value="value"></v-select>
 
         <div class="d-flex flex-row-reverse flex-wrap">
+          <v-btn color="primary" @click="scan(1)" class="ml-1 mb-1">{{ $t('scan.btn-scan') }} <v-icon class="ml-2">mdi-camera</v-icon></v-btn>
           <v-btn color="green" @click="createPreview" class="ml-1 mb-1">{{ $t('scan.btn-preview') }} <v-icon class="ml-2">mdi-magnify</v-icon></v-btn>
           <v-btn color="amber" @click="deletePreview" class="ml-1 mb-1">{{ $t('scan.btn-clear') }} <v-icon class="ml-2">mdi-delete</v-icon></v-btn>
-          <v-btn color="primary" @click="scan(1)" class="ml-1 mb-1">{{ $t('scan.btn-scan') }} <v-icon class="ml-2">mdi-camera</v-icon></v-btn>
         </div>
       </v-col>
 
@@ -64,16 +64,16 @@
       </v-col>
 
       <v-col cols="12" md="3" class="mb-10 mb-md-0">
-        <v-text-field :label="$t('scan.top')" type="number" v-model="request.params.top" @blur="onCoordinatesChange" />
-        <v-text-field :label="$t('scan.left')" type="number" v-model="request.params.left" @blur="onCoordinatesChange" />
-        <v-text-field :label="$t('scan.width')" type="number" v-model="request.params.width" @blur="onCoordinatesChange" />
-        <v-text-field :label="$t('scan.height')" type="number" v-model="request.params.height" @blur="onCoordinatesChange" />
+        <v-text-field :label="$t('scan.top')" type="number" step="any" v-model="request.params.top" @blur="onCoordinatesChange" />
+        <v-text-field :label="$t('scan.left')" type="number" step="any" v-model="request.params.left" @blur="onCoordinatesChange" />
+        <v-text-field :label="$t('scan.width')" type="number" step="any" v-model="request.params.width" @blur="onCoordinatesChange" />
+        <v-text-field :label="$t('scan.height')" type="number" step="any" v-model="request.params.height" @blur="onCoordinatesChange" />
 
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="primary" v-bind="attrs" v-on="on">{{ $t('scan.paperSize') }}</v-btn>
           </template>
-          <v-list>
+          <v-list dense>
             <v-list-item
               v-for="(item, index) in paperSizes"
               @click="updatePaperSize(item)"
@@ -223,9 +223,15 @@ export default {
         y: this.device.features['-y'].limits[1]
       };
 
-      const paperSizes = this.context.paperSizes
-        .filter(paper => paper.dimensions.x <= deviceSize.x && paper.dimensions.y <= deviceSize.y);
-      return paperSizes;
+      return this.context.paperSizes
+        .filter(paper => paper.dimensions.x <= deviceSize.x && paper.dimensions.y <= deviceSize.y)
+        .map(paper => {
+          const variables = (paper.name.match(/@:[a-z-.]+/ig) || []).map(s => s.substr(2));
+          variables.forEach(v => {
+            paper.name = paper.name.replaceAll(`@:${v}`, this.$t(v));
+          });
+          return paper;
+        });
     },
 
     pipelines() {

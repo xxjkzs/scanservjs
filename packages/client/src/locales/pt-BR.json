@@ -43,7 +43,15 @@
     "filename": "Nome do arquivo",
     "date": "Data",
     "size": "Tamanho",
-    "message:deleted": "Excluído"
+    "items-per-page": "Files per page",
+    "items-per-page-all": "All",
+    "message:deleted": "Excluído {0}",
+    "message:renamed": "File renamed",
+    "button:delete-selected": "Delete Selected",
+    "dialog:rename": "Change file name",
+    "dialog:rename-cancel": "Cancel",
+    "dialog:rename-save": "Save",
+    "actions": "Actions"
   },
 
   "navigation": {
@@ -106,6 +114,17 @@
     "ocr": "OCR",
     "text-file": "Arquivo de texto"
   },  
+
+  "paper-size": {
+    "letter": "Letter",
+    "legal": "Legal",
+    "tabloid": "Tabloid",
+    "ledger": "Ledger",
+    "junior-legal": "Junior legal",
+    "half-letter": "Half letter",
+    "portrait": "Portrait",
+    "landscape": "Landscape"
+  },
 
   "scan": {
     "device": "Dispositivo",
