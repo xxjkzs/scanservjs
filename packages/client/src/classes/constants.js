@@ -25,9 +25,12 @@ const Constants = {
     'es',
     'fr',
     'it',
+    'nl',
     'pl',
+    'pt',
     'pt-BR',
     'ru',
+    'tr',
     'zh',
     'test'
   ],

@@ -1,6 +1,7 @@
 const log = require('loglevel').getLogger('Scanimage');
 
 const CmdBuilder = require('./command-builder');
+/** @type {Configuration} */
 const Config = require('./config');
 const Constants = require('./constants');
 
@@ -53,12 +54,22 @@ class Scanimage {
       cmdBuilder.arg('--source', params.source);
     }
       
-    cmdBuilder.arg('--resolution', params.resolution)
-      .arg('-l', params.left)
-      .arg('-t', params.top)
-      .arg('-x', params.width)
-      .arg('-y', params.height)
-      .arg('--format', params.format);
+    cmdBuilder.arg('--resolution', params.resolution);
+
+    if ('scanimageAdditionalArguments' in Config) {
+      Object.entries(Config.scanimageAdditionalArguments).forEach(([key, value]) => {
+        cmdBuilder.arg(key, value);
+      });
+    }
+
+    if (['left', 'top', 'width', 'height'].every(s => s in params)) {
+      cmdBuilder.arg('-l', params.left)
+        .arg('-t', params.top)
+        .arg('-x', params.width)
+        .arg('-y', params.height);
+    }
+
+    cmdBuilder.arg('--format', params.format);
   
     if ('depth' in params) {
       cmdBuilder.arg('--depth', params.depth);

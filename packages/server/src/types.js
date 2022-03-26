@@ -24,7 +24,8 @@
  * @typedef {Object} ScanDevice
  * @property {string} id
  * @property {string} name
- * @property {string} version
+ * @property {string} string
+ * @property {boolean} geometry
  * @property {Object.<string, ScanDeviceFeature>} features
  */
 
@@ -62,6 +63,7 @@
  * @property {boolean} devicesFind
  * @property {string} ocrLanguage
  * @property {string} scanimage
+ * @property {Object.<string, string>} scanimageAdditionalArguments
  * @property {string} convert
  * @property {string} tesseract
  * @property {boolean} allowUnsafePaths
