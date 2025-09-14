@@ -1,41 +1,55 @@
 # Builder image
 #
-# The builder image simply builds the core javascript app and nothing else
+# The builder image builds the core javascript app and debian package
 # ==============================================================================
-FROM node:16-alpine AS scanservjs-build
+FROM node:18-bookworm-slim AS scanservjs-build
 ENV APP_DIR=/app
 WORKDIR "$APP_DIR"
 
-COPY package*.json "$APP_DIR/"
-COPY packages/server/package*.json "$APP_DIR/packages/server/"
-COPY packages/client/package*.json "$APP_DIR/packages/client/"
+COPY package*.json build.js "$APP_DIR/"
+COPY app-server/package*.json "$APP_DIR/app-server/"
+COPY app-ui/package*.json "$APP_DIR/app-ui/"
 
-RUN npm run install
+RUN npm clean-install .
 
-COPY packages/client/ "$APP_DIR/packages/client/"
-COPY packages/server/ "$APP_DIR/packages/server/"
+COPY app-server/ "$APP_DIR/app-server/"
+COPY app-ui/ "$APP_DIR/app-ui/"
 
 RUN npm run build
 
+COPY makedeb.sh "$APP_DIR/"
+RUN ./makedeb.sh
+
 # Sane image
 #
-# This is the minimum bullseye/node/sane image required which is used elsewhere.
+# This is the minimum bookworm/node/sane image required which is used elsewhere.
+# Dependencies are installed here in order to anticipate and cache what will
+# be required by the deb package. It would all still work perfectly well if this
+# layer did not exist but testing would be slower and more painful.
 # ==============================================================================
-FROM node:16-bullseye-slim AS scanservjs-base
+FROM debian:bookworm-slim AS scanservjs-base
 RUN apt-get update \
   && apt-get install -yq \
+    nodejs \
+    adduser \
     imagemagick \
-    sane \
+    ipp-usb \
+    sane-airscan \
     sane-utils \
     tesseract-ocr \
-    sane-airscan \
-  && sed -i \
-    's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"'/ \
-    /etc/ImageMagick-6/policy.xml \
-  && sed -i \
-    's/policy domain="resource" name="disk" value="1GiB"/policy domain="resource" name="disk" value="8GiB"'/ \
-    /etc/ImageMagick-6/policy.xml \
-  && npm install -g npm@8.3.0
+    tesseract-ocr-ces \
+    tesseract-ocr-deu \
+    tesseract-ocr-eng \
+    tesseract-ocr-spa \
+    tesseract-ocr-fra \
+    tesseract-ocr-ita \
+    tesseract-ocr-nld \
+    tesseract-ocr-pol \
+    tesseract-ocr-por \
+    tesseract-ocr-rus \
+    tesseract-ocr-tur \
+    tesseract-ocr-chi-sim \
+  && rm -rf /var/lib/apt/lists/*;
 
 # Core image
 #
@@ -44,15 +58,13 @@ RUN apt-get update \
 # own image with drivers then this is likely the image to start from.
 # ==============================================================================
 FROM scanservjs-base AS scanservjs-core
-
-ENV APP_DIR=/app
-WORKDIR "$APP_DIR"
-
 ENV \
   # This goes into /etc/sane.d/net.conf
   SANED_NET_HOSTS="" \
   # This gets added to /etc/sane.d/airscan.conf
   AIRSCAN_DEVICES="" \
+  # This gets added to /etc/sane.d/pimxa.conf
+  PIXMA_HOSTS="" \
   # This directs scanserv not to bother querying `scanimage -L`
   SCANIMAGE_LIST_IGNORE="" \
   # This gets added to scanservjs/server/config.js:devices
@@ -60,14 +72,17 @@ ENV \
   # Override OCR language
   OCR_LANG=""
 
-# Copy entry point
-COPY run.sh /run.sh
-RUN ["chmod", "+x", "/run.sh"]
-ENTRYPOINT [ "/run.sh" ]
+# Copy entry point
+COPY entrypoint.sh /entrypoint.sh
+RUN ["chmod", "+x", "/entrypoint.sh"]
+ENTRYPOINT [ "/entrypoint.sh" ]
 
 # Copy the code and install
-COPY --from=scanservjs-build "$APP_DIR/dist" "$APP_DIR/"
-RUN npm install --production
+COPY --from=scanservjs-build "/app/debian/scanservjs_*.deb" "/"
+RUN apt-get install ./scanservjs_*.deb \
+  && rm -f ./scanservjs_*.deb
+
+WORKDIR /usr/lib/scanservjs
 
 EXPOSE 8080
 
@@ -80,17 +95,18 @@ EXPOSE 8080
 # ==============================================================================
 FROM scanservjs-core AS scanservjs-user2001
 
-# Make it possible to override the UID/GID/username of the user running scanservjs
+# Make it possible to override the UID/GID/username of the user running
+# scanservjs
 ARG UID=2001
 ARG GID=2001
 ARG UNAME=scanservjs
 
-# Create a known user
-RUN groupadd -g $GID -o $UNAME
-RUN useradd -o -u $UID -g $GID -m -s /bin/bash $UNAME
-
-# Change the ownership of config and data since we need to write there
-RUN chown -R $UID:$GID config data /etc/sane.d/net.conf /etc/sane.d/airscan.conf
+# Create a known user, and change ownership on relevant files (the entrypoint
+# script and $APP_DIR must be readable to run the service itself, and some
+# config files need write access).
+RUN groupadd -g $GID -o $UNAME \
+  && useradd -o -u $UID -g $GID -m -s /bin/bash $UNAME \
+  && chown -R $UID:$GID /entrypoint.sh /var/lib/scanservjs /etc/sane.d/net.conf /etc/sane.d/airscan.conf
 USER $UNAME
 
 # default build
@@ -102,7 +118,25 @@ FROM scanservjs-core
 # default - you will need to specifically target it.
 # ==============================================================================
 FROM scanservjs-core AS scanservjs-hplip
-RUN apt-get install -yq libsane-hpaio \
+RUN apt-get update \
+  && apt-get install -yq libsane-hpaio \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && echo hpaio >> /etc/sane.d/dll.conf
+
+# brscan4 image
+#
+# This image includes the brscan4 driver which is needed for some Brother
+# printers/scanners. This target is not built by default -
+# you will need to specifically target it.
+# ==============================================================================
+FROM scanservjs-core AS scanservjs-brscan4
+RUN apt-get update \
+  && apt-get install -yq curl \
+  && curl -fSsL "https://download.brother.com/welcome/dlf105200/brscan4-0.4.11-1.amd64.deb" -o /tmp/brscan4.deb \
+  && apt-get remove curl -yq \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
+  && dpkg -i /tmp/brscan4.deb \
+  && rm /tmp/brscan4.deb \
+  && echo brscan4 >> /etc/sane.d/dll.conf
