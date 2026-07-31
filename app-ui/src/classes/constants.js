@@ -1,6 +1,6 @@
 const Constants = {
   Version: __PACKAGE_VERSION__,
-  
+
   DateTimeFormat: {
     short: {
       year: 'numeric',
@@ -17,11 +17,12 @@ const Constants = {
       hourCycle: 'h23'
     }
   },
-  
+
   Locales: [
     'ar',
     'cs',
     'de',
+    'el',
     'en',
     'en-US',
     'es',
@@ -37,6 +38,7 @@ const Constants = {
     'tr',
     'uk',
     'zh',
+    'zh-TW',
     'test'
   ],
 
@@ -48,7 +50,7 @@ const Constants = {
     enter: 13,
     escape: 27
   },
-  
+
   Themes: {
     Dark: 'dark',
     Light: 'light',

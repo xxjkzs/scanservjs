@@ -2,7 +2,7 @@
 #
 # The builder image builds the core javascript app and debian package
 # ==============================================================================
-FROM node:18-bookworm-slim AS scanservjs-build
+FROM node:24-trixie-slim AS scanservjs-build
 ENV APP_DIR=/app
 WORKDIR "$APP_DIR"
 
@@ -10,10 +10,10 @@ COPY package*.json build.js "$APP_DIR/"
 COPY app-server/package*.json "$APP_DIR/app-server/"
 COPY app-ui/package*.json "$APP_DIR/app-ui/"
 
-RUN npm clean-install .
+RUN npm clean-install . && npm run bootstrap
 
-COPY app-server/ "$APP_DIR/app-server/"
-COPY app-ui/ "$APP_DIR/app-ui/"
+COPY --exclude="**/node_modules" app-server/ "$APP_DIR/app-server/"
+COPY --exclude="**/node_modules" app-ui/ "$APP_DIR/app-ui/"
 
 RUN npm run build
 
@@ -22,12 +22,12 @@ RUN ./makedeb.sh
 
 # Sane image
 #
-# This is the minimum bookworm/node/sane image required which is used elsewhere.
+# This is the minimum trixie/node/sane image required which is used elsewhere.
 # Dependencies are installed here in order to anticipate and cache what will
 # be required by the deb package. It would all still work perfectly well if this
 # layer did not exist but testing would be slower and more painful.
 # ==============================================================================
-FROM debian:bookworm-slim AS scanservjs-base
+FROM debian:trixie-slim AS scanservjs-base
 RUN apt-get update \
   && apt-get install -yq \
     nodejs \

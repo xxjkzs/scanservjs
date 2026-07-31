@@ -33,7 +33,7 @@ docker run \
 container and will be lost if you recreate it. If you want to map your scanned
 images then see mapping section below
 
-✅ The docker image supports arm as well as amd64.
+✅ The docker image supports arm64 as well as amd64.
 
 ## Accessing hardware
 
@@ -419,14 +419,14 @@ Synology NAS:
    similar). Scanning can be slow, so set the proxy timeouts to 300 seconds or
    more [to prevent timeout issues](troubleshooting.md).
 
-## Staging builds
+## Master builds
 
 These may be less stable, but also have upcoming features.
 
-If you want to install the latest staging branch (this may contain newer code)
+If you want to install the latest master branch (this may contain newer code)
 
 ```sh
-docker pull sbs20/scanservjs:staging
+docker pull sbs20/scanservjs:master
 docker rm --force scanservjs-container 2> /dev/null
 docker run \
   --detach \
@@ -434,5 +434,5 @@ docker run \
   --volume /var/run/dbus:/var/run/dbus \
   --restart unless-stopped \
   --name scanservjs-container \
-  --privileged sbs20/scanservjs:staging
+  --privileged sbs20/scanservjs:master
 ```

@@ -9,7 +9,7 @@
 
 ![screenshot](https://github.com/sbs20/scanservjs/raw/master/docs/screen0.jpg)
 
-Copyright 2016-2023 [Sam Strachan](https://github.com/sbs20)
+Copyright 2016-2026 [Sam Strachan](https://github.com/sbs20)
 
 ## What people are saying
 
@@ -53,7 +53,7 @@ complicated installation.
   [Help requested](https://github.com/sbs20/scanservjs/issues/154)
 * Light and dark mode
 * Responsive design
-* Docker images for `amd64`, `arm64` and `armv7`
+* Docker images for `amd64` and `arm64`
 * OpenAPI documentation
 
 It supports any
