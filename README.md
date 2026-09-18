@@ -53,7 +53,7 @@ complicated installation.
   [Help requested](https://github.com/sbs20/scanservjs/issues/154)
 * Light and dark mode
 * Responsive design
-* Docker images for `amd64` and `arm64`
+* Docker images for `amd64`, `arm64` and `armv7`
 * OpenAPI documentation
 
 It supports any
@@ -109,6 +109,10 @@ It supports any
 * [Testing](docs/60-testing.md)
 * [References](docs/90-references.md)
 * [QNAP](docs/91-qnap.md)
+
+### External resources
+
+* [External resources](docs/99-external.md)
 
 ## Running scanservjs
 
